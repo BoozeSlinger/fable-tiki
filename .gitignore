@@ -1,0 +1,10 @@
+node_modules
+dist
+.next
+.venv-tools
+*.local
+.DS_Store
+npm-debug.log*
+pnpm-debug.log*
+.vite
+next-env.d.ts

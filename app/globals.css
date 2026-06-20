@@ -1,0 +1,179 @@
+/* Scope content scanning to our source only. Without an explicit source the
+   v4 oxide scanner walks the whole project tree (no .git here to prune it),
+   which stalls on the .venv-tools Python venv's looping symlinks. */
+@import "tailwindcss" source(none);
+@source "./**/*.{ts,tsx}";
+@source "../src/**/*.{ts,tsx}";
+
+/* ----------------------------------------------------------------------
+   Luna Lagoon — design tokens (Tailwind v4 @theme exposes these as
+   utilities: bg-bg, text-torch, font-display, etc.)
+---------------------------------------------------------------------- */
+@theme {
+  --color-bg: #0a0a12;        /* deep space charcoal */
+  --color-torch: #ff7a33;     /* warm tiki-orange    */
+  --color-lagoon: #46e0d0;    /* moon-cyan           */
+  --color-neon: #ff3d7f;      /* hot-pink sign       */
+  --color-sand: #e9e2d6;      /* warm bone text      */
+
+  --font-display: "Rye", serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-eyebrow: "Oswald", sans-serif;
+  --font-neon: "Monoton", cursive;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-sand);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Lenis smooth-scroll baseline */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---- Eyebrow label ---- */
+.eyebrow {
+  font-family: var(--font-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: 0.78rem;
+  color: var(--color-lagoon);
+}
+
+/* ---- Film grain overlay (fixed, on top of everything) ---- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---- Nebula radial glows (torch + lagoon) ---- */
+.nebula-torch {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--color-torch) 55%, transparent),
+    transparent 70%
+  );
+}
+.nebula-lagoon {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--color-lagoon) 50%, transparent),
+    transparent 70%
+  );
+}
+
+/* ---- SplitText / scroll reveals ---- */
+.pre-reveal {
+  opacity: 0;
+}
+.split-line {
+  will-change: transform;
+  padding-bottom: 0.08em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pre-reveal {
+    opacity: 1 !important;
+  }
+}
+
+/* ---- Scramble headline letters ---- */
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.ltr {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* ---- Floating character idle drift ---- */
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--floaty-rot, 0deg));
+  }
+  50% {
+    transform: translateY(-16px) rotate(calc(var(--floaty-rot, 0deg) * -1));
+  }
+}
+.floaty {
+  animation: floaty var(--floaty-dur, 7s) ease-in-out infinite;
+  animation-delay: var(--floaty-delay, 0s);
+  will-change: transform;
+}
+
+/* soft halo for floating cutouts (depth without a hard edge) */
+.glow-torch {
+  filter: drop-shadow(0 0 38px color-mix(in oklab, var(--color-torch) 40%, transparent));
+}
+.glow-lagoon {
+  filter: drop-shadow(0 0 38px color-mix(in oklab, var(--color-lagoon) 38%, transparent));
+}
+.glow-neon {
+  filter: drop-shadow(0 0 34px color-mix(in oklab, var(--color-neon) 42%, transparent));
+}
+
+/* ---- Flickering neon sign ---- */
+@keyframes neon-flicker {
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  24%,
+  55% {
+    opacity: 0.55;
+  }
+}
+.neon-sign {
+  font-family: var(--font-neon);
+  color: var(--color-neon);
+  text-shadow:
+    0 0 6px var(--color-neon),
+    0 0 20px color-mix(in oklab, var(--color-neon) 70%, transparent),
+    0 0 44px color-mix(in oklab, var(--color-neon) 50%, transparent);
+  animation: neon-flicker 4s infinite;
+}
+
+/* ---- Reduced motion: kill all the fun, keep it readable ---- */
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    display: none;
+  }
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
